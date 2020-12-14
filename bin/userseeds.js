@@ -1,5 +1,5 @@
 // create a test data set of valid users
-require("dotenv");
+require("dotenv").config();
 require("./../config/mongo"); // fetch the db connection
 
 const UserModel = require("./../models/Users"); // fetch the model to validate our user document before insertion (in database)
