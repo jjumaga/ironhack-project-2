@@ -7,20 +7,19 @@ const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
 const hbs = require("hbs");
 const mongoose = require("mongoose");
-const session = require("express-station");
+const session = require("express-session");
+const MongoStore = require("connect-mongo")(session);
 const SpotifyWebApi = require("spotify-web-api-node");
+const dev_mode = false;
 const logger = require("morgan");
 const path = require("path");
 
-//Define Routers
-//const memoriesRouter = require("./routes/memories");
-//const spotifyRouter = require("./routes/spotify");
-//const usersRouter = require("./routes/users");
+const indexRouter = require("./routes/index");
 
 // HBS/VIEWS SET UP
-app.set("views", path.join(__dirname, "views"));
+app.set("views", __dirname + "/views");
 app.set("view engine", "hbs");
-hbs.registerPartials(path.join(__dirname, "views/partials"));
+hbs.registerPartials(__dirname + "/views/partials");
 
 // SPOTIFY SET UP
 const spotifyApi = new SpotifyWebApi({
@@ -39,11 +38,24 @@ spotifyApi
 //to-do selon CRUD
 
 // LISTEN
-app.listen(process.env.PORT, () => {
-  console.log("let's roooock @ http://localhost:" + process.env.PORT);
-});
+//app.listen(process.env.PORT, () => {
+//  console.log("let's roooock @ http://localhost:" + process.env.PORT);
+//});
 
 app.use(flash());
+
+//app.use(
+//  session({
+//    secret: process.env.SESSION_SECRET,
+//    cookie: { maxAge: 600000000 },
+//    store: new MongoStore({
+//      mongooseConnection: mongoose.connection,
+//      ttl: 24 * 60 * 60,
+//    }),
+//    saveUninitialized: true,
+//    resave: true,
+//  })
+//);
 
 //MIDDLEWARES
 
@@ -54,6 +66,13 @@ if (dev_mode === true) {
 
 app.use(require("./middlewares/exposeLoginStatus"));
 app.use(require("./middlewares/exposeFlashMessage"));
+
+app.use("/", indexRouter);
+
+//Define Routers
+//const memoriesRouter = require("./routes/memories");
+//const spotifyRouter = require("./routes/spotify");
+//const usersRouter = require("./routes/users");
 
 // POSSIBLE EXPORTS
 module.exports = app;
