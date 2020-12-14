@@ -2,10 +2,14 @@ require("dotenv").config();
 require("./config/mongo");
 
 const express = require("express");
-const hbs = require("hbs");
 const app = express();
-const SpotifyWebApi = require("spotify-web-api-node");
+const cookieParser = require("cookie-parser");
+const flash = require("connect-flash");
+const hbs = require("hbs");
 const mongoose = require("mongoose");
+const session = require("express-station");
+const SpotifyWebApi = require("spotify-web-api-node");
+const logger = require("morgan");
 const path = require("path");
 
 //Define Routers
@@ -38,6 +42,18 @@ spotifyApi
 app.listen(process.env.PORT, () => {
   console.log("let's roooock @ http://localhost:" + process.env.PORT);
 });
+
+app.use(flash());
+
+//MIDDLEWARES
+
+if (dev_mode === true) {
+  app.use(require("./middlewares/devMode")); // triggers dev mode during dev phase
+  app.use(require("./middlewares/debugSessionInfos")); // displays session debug
+}
+
+app.use(require("./middlewares/exposeLoginStatus"));
+app.use(require("./middlewares/exposeFlashMessage"));
 
 // POSSIBLE EXPORTS
 module.exports = app;
